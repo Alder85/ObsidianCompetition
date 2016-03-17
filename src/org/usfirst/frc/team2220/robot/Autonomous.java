@@ -56,8 +56,9 @@ public class Autonomous {
 	
 	public void readSerial()
 	{
-		for(int i = 0;i < 10;i++)
+		for(int i = 0;i < 200;i++)
 			serial.update();
+		System.out.println(serial.getLidarValue());
 	}
 	
 	/**
@@ -66,13 +67,18 @@ public class Autonomous {
 	public void shoot()
 	{
 		double voltVal = (12.2204) * Math.pow((.99989), (serial.getAverageLidarValue()));
-		voltVal = 8.8;
+		if(voltVal < 8.9)
+			voltVal = 8.9;
+		
+		System.out.println("Voltage = " + voltVal + "LIDAR = " + serial.getAverageLidarValue());
+		//voltVal = 8.8;
 		collector.set(-1.0);
 		Timer.delay(0.15); //previously 0.05
 		collector.set(0);
+		Timer.delay(1.0);
 		rightShooter.set(-voltVal);
 		leftShooter.set(voltVal);
-		Timer.delay(1.375);
+		Timer.delay(1.2);
 		collector.set(1.0);
 		Timer.delay(2.0);
 		rightShooter.set(0);
