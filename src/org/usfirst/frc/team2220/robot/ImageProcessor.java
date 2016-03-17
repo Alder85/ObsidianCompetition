@@ -39,6 +39,12 @@ public class ImageProcessor {
 	NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(60, 196);
 	NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(52, 231);
 	
+	/* use this maybe
+	NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(113, 124); // brightgreen/white
+	NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(233, 255);
+	NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(240, 255);
+	*/
+	
 	double AREA_MINIMUM = 0.25; // Default Area minimum for particle as a
 								// percentage of total image area
 	double AREA_MAXIMUM = 10.00; // default max

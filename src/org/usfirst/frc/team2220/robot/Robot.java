@@ -119,6 +119,7 @@ public class Robot extends SampleRobot {
     	//lifterRelease.setMaxCurrent(30); TODO uncomment
     	
     	//TODO change these
+    	/*
     	flModule.reverseTalon(true);
     	blModule.reverseTalon(true);
     	
@@ -130,6 +131,18 @@ public class Robot extends SampleRobot {
     	
     	frModule.reverseSensor(false);
     	brModule.reverseSensor(false);
+    	*/
+    	flModule.reverseTalon(false);
+    	blModule.reverseTalon(true);
+    	
+    	frModule.reverseTalon(false);
+    	brModule.reverseTalon(true);
+    	
+    	
+    	frModule.setRightWheel(true);
+    	brModule.setRightWheel(true);
+    	
+    	frModule.reverseSensor(false);
     	
     	talon2.enableBrakeMode(false);
     	talon4.enableBrakeMode(false);
