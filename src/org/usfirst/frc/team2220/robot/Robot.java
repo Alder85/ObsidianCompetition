@@ -44,16 +44,15 @@ public class Robot extends SampleRobot {
 	TwilightTalon blWheel = new TwilightTalon(3);
 	TwilightTalon brWheel = new TwilightTalon(6);
 	
-	//TODO previously 9-10-12
-	TwilightTalon collector = new TwilightTalon(10);
-	TwilightTalon rightShooter = new TwilightTalon(9);
+	TwilightTalon collector = new TwilightTalon(9);
+	TwilightTalon rightShooter = new TwilightTalon(10);
 	TwilightTalon leftShooter  = new TwilightTalon(12);
+	
 	
 	Gyro gyro = new AnalogGyro(0);
 	
-	//TODO uncomment these
-	//TwilightTalon lifterRelease = new TwilightTalon(13);
-	//TwilightTalon wench = new TwilightTalon(14);
+	TwilightTalon lifterRelease = new TwilightTalon(13);
+	TwilightTalon wench = new TwilightTalon(14);
 	
 	//POSITIVE SPINS counterclockwise 
 	TwilightTalon collectorExtender = new TwilightTalon(11);
@@ -69,7 +68,6 @@ public class Robot extends SampleRobot {
 	XBoxController driverController = new XBoxController(0);
 	XBoxController manipulatorController = new XBoxController(1);
 	
-	//TODO test both of these
 	DigitalInput frontCollector = new DigitalInput(0);
 	DigitalInput rearCollector  = new DigitalInput(1);
 	
@@ -94,10 +92,11 @@ public class Robot extends SampleRobot {
 		serial = new SerialCom();
 		
 		frame = NIVision.imaqCreateImage(ImageType.IMAGE_RGB, 0);
-		session0 = NIVision.IMAQdxOpenCamera("cam0", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
-		session1 = NIVision.IMAQdxOpenCamera("cam1", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+		session0 = NIVision.IMAQdxOpenCamera("cam3", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+		session1 = NIVision.IMAQdxOpenCamera("cam4", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
 		NIVision.IMAQdxConfigureGrab(session1);
 		processor = new ImageProcessor(session1);
+		
 		
 		collectorExtender.enableBrakeMode(true);
     	
@@ -116,22 +115,8 @@ public class Robot extends SampleRobot {
     	leftShooter.setMaxCurrent(70);
     	
     	collectorExtender.setMaxCurrent(120);
-    	//lifterRelease.setMaxCurrent(30); TODO uncomment
+    	lifterRelease.setMaxCurrent(30);
     	
-    	//TODO change these
-    	/*
-    	flModule.reverseTalon(true);
-    	blModule.reverseTalon(true);
-    	
-    	frModule.reverseTalon(true);
-    	brModule.reverseTalon(false);
-    	
-    	frModule.setRightWheel(true);
-    	brModule.setRightWheel(true);
-    	
-    	frModule.reverseSensor(false);
-    	brModule.reverseSensor(false);
-    	*/
     	flModule.reverseTalon(false);
     	blModule.reverseTalon(true);
     	
@@ -165,13 +150,12 @@ public class Robot extends SampleRobot {
     	drivetrain.setModules(flModule, frModule, brModule, blModule);
     	drivetrain.setWheels(flWheel, frWheel, brWheel, blWheel);
     	
-    	/*TODO test and uncomment
     	lifterRelease.setFeedbackDevice(FeedbackDevice.PulseWidth);
     	lifterRelease.changeControlMode(TalonControlMode.Position);
     	lifterRelease.setPID(1.0, 0.001, 0.0);
     	lifterRelease.reverseOutput(true);
     	lifterRelease.setAllowableClosedLoopErr(30);
-    	*/
+    	
     }
 	
 	boolean autoShooting = false;
@@ -182,6 +166,7 @@ public class Robot extends SampleRobot {
      */
     public void autonomous() 
     {
+    	/*
     	if(isEnabled() && isAutonomous())
     	{
 	    	frWheel.enableBrakeMode(true);
@@ -198,6 +183,7 @@ public class Robot extends SampleRobot {
 	    	autonomous.readSerial();
 	    	autonomous.shoot();
 	    }
+	    */
 
     }
 	/**
@@ -210,10 +196,7 @@ public class Robot extends SampleRobot {
     	flWheel.enableBrakeMode(false);
     	brWheel.enableBrakeMode(false);
     	blWheel.enableBrakeMode(false);
-    	
-    	
-    	//TODO uncomment
-    	//double lifterPosition = (lifterRelease.getPulseWidthPosition() / 4096);
+
     	double leftAxis, rightAxis;
     	double wenchAxis;
     	double wheelDZ = 0.15;
@@ -237,7 +220,7 @@ public class Robot extends SampleRobot {
         	
 			/////////////////////////
 			//       Modules       //
-			///////////////////////// TODO test
+			/////////////////////////
         	if(driverController.onPress(TriggerButton.lTrigger))
         		drivetrain.incrementAllModules(-1);
         	
@@ -284,29 +267,35 @@ public class Robot extends SampleRobot {
 			
 			/////////////////////////
 			//      Collector      //
-			///////////////////////// TODO reimplement limit switches
+			///////////////////////// TODO add if becomes a problem
 			if(!autoShooting)
 			{
 				if(manipulatorController.whileHeld(TriggerButton.lTrigger)) //intake
 				{
 					//if(rearCollector.get())
+					SmartDashboard.putString("intakeTest", "intaking");
 						collector.set(1.0);
 						//else set 0
 				}
 				else if(manipulatorController.whileHeld(TriggerButton.rTrigger))
 				{
+					SmartDashboard.putString("intakeTest", "outtaking");
 					//if(rearCollector.get())
 						collector.set(-1.0);
 						//else set 0
 				}
 				else
+				{
+					SmartDashboard.putString("intakeTest", "not running");
 					collector.set(0);
+				}
 			}
 			
 			/////////////////////////
 			//    Shooter Wheels   //
 			/////////////////////////
 			shooterVoltage = (12.2204) * Math.pow((.99989), (serial.getAverageLidarValue()));
+			shooterVoltage += 0.5;
 			if(shooterVoltage < 8.9)
 				shooterVoltage = 8.9;
 			
@@ -316,8 +305,8 @@ public class Robot extends SampleRobot {
 				autoShooting = true;
 				if(shootTimer.get() == 0)
 					shootTimer.start();
-				rightShooter.set(shooterVoltage);
-				leftShooter.set(-shooterVoltage);
+				rightShooter.set(-shooterVoltage);
+				leftShooter.set(shooterVoltage);
 				if(shootTimer.get() > shotLength)
 				{
 					collector.set(1.0);
@@ -330,9 +319,11 @@ public class Robot extends SampleRobot {
         		leftShooter.set(0);
         		shootTimer.reset();
         	}
+        	
 			
 			SmartDashboard.putNumber("shooterVoltage", shooterVoltage);
 			SmartDashboard.putNumber("shotLength", shotLength);
+			SmartDashboard.putBoolean("autoShooting", autoShooting);
 			
 			SmartDashboard.putNumber("rightShooterVoltage", rightShooter.getOutputVoltage());
 			SmartDashboard.putNumber("leftShooterVoltage", leftShooter.getOutputVoltage());
@@ -340,7 +331,8 @@ public class Robot extends SampleRobot {
 			SmartDashboard.putNumber("shootTimer", shootTimer.get());
 			/////////////////////////
 			//    Camera Toggle    //
-			/////////////////////////
+			///////////////////////// TODO fix
+			
 			double currentPOVval = driverController.getPOV();
 			if(currentPOVval == 270 && prevPOVval != 270)
 			{
@@ -367,9 +359,10 @@ public class Robot extends SampleRobot {
 				NIVision.IMAQdxGrab(session0, frame, 1);
 			}
 			CameraServer.getInstance().setImage(frame);
+			
 			/////////////////////////
 			//  Collector Extender //
-			///////////////////////// TODO fix this with limit switches
+			/////////////////////////
 			
 			if(manipulatorController.getPOV() != -1)
 			{
@@ -377,14 +370,14 @@ public class Robot extends SampleRobot {
 				if(manipulatorController.getPOV() == 0) //forwards
 				{
 					if(frontCollector.get())
-	        			collectorExtender.set(1.0);
+	        			collectorExtender.set(-1.0);
 	        		else
 	        			collectorExtender.set(0);
 				}
 				else if(manipulatorController.getPOV() == 180)
 				{
 					if(rearCollector.get())
-	        			collectorExtender.set(-1.0);
+	        			collectorExtender.set(1.0);
 	        		else
 	        			collectorExtender.set(0);
 				}
@@ -401,9 +394,9 @@ public class Robot extends SampleRobot {
 			
 			/////////////////////////
 			//        Lifter       //
-			///////////////////////// TODO implement
+			/////////////////////////
 			
-			/*
+			
 			if(manipulatorController.onPress(Button.bButton))
 			{
 				if(rearCollector.get())
@@ -421,12 +414,14 @@ public class Robot extends SampleRobot {
 			}
 			
 			wenchAxis = deadZone(manipulatorController.getRawAxis(1) * -1, wheelDZ);
+			if(wenchAxis > 0)
+				wenchAxis = 0;
         	wench.set(wenchAxis);
-        	*/
+        	
 			       	
         	/////////////////////////
         	//   Print Everything  //
-        	/////////////////////////TODO print only relevant things
+        	/////////////////////////
         	dashCount++;
         	if(dashCount > 20000)
         		dashCount = 0;
@@ -466,6 +461,8 @@ public class Robot extends SampleRobot {
         		flModule.resetTarget();
         		blModule.resetTarget();
         		brModule.resetTarget();
+        		
+        		collector.enable();
         	}
         	if(manipulatorController.onPress(Button.start))
         	{
@@ -478,7 +475,7 @@ public class Robot extends SampleRobot {
         	
         	collector.test();
         	
-        	//lifterRelease.test(); TODO nah
+        	//lifterRelease.test();
         	collectorExtender.test();
         	
        
@@ -577,13 +574,7 @@ public class Robot extends SampleRobot {
     
     public void practice()
     {
-    	while(isEnabled())
-    	{
-    		SmartDashboard.putNumber("backRightErr", talon5.getError());
-    		SmartDashboard.putNumber("backLeftErr", talon4.getError());
-	    	SmartDashboard.putNumber("frontRightErr", talon7.getError());
-	    	SmartDashboard.putNumber("frontLeftErr", talon2.getError());
-    	}
+    	
     }
 
     public void test() {

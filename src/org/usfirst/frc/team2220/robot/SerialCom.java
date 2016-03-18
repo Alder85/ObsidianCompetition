@@ -47,7 +47,8 @@ public class SerialCom {
             
             if(lidarValues.size() > 5)
             {
-            	if(currentLidarValue < lidarSum + 1000)
+            	//if(currentLidarValue < lidarSum + 15000)
+            	if(currentLidarValue< 15000)
             		lidarValues.add(currentLidarValue);	
             }
             else
