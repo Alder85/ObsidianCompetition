@@ -83,6 +83,9 @@ public class Robot extends SampleRobot {
 	ImageProcessor processor;
 	Autonomous autonomous;
 	SerialCom serial;
+	
+	boolean overideShooting = false;
+	boolean overideHigh = false;
 
     /**
      * Initializes everything with presets needed for both autonomous and teleop
@@ -299,6 +302,26 @@ public class Robot extends SampleRobot {
 			if(shooterVoltage < 8.9)
 				shooterVoltage = 8.9;
 			
+			if(manipulatorController.onPress(Button.rBumper))
+			{
+				overideShooting = true;
+				overideHigh = false;
+			}
+			if(manipulatorController.onPress(Button.xButton))
+			{
+				overideShooting = false;
+				overideHigh = true;				
+			}
+			if(manipulatorController.onPress(Button.lBumper))
+			{
+				overideShooting = false;
+				overideHigh = false;
+			}
+			
+			if(overideShooting)
+				shooterVoltage = 8.9;
+			if(overideHigh)
+				shooterVoltage = 11;
 			
 			if(manipulatorController.whileHeld(Button.aButton))
 			{

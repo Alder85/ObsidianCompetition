@@ -49,7 +49,7 @@ public class Autonomous {
 	
 	public void extendCollector(double timeVal)
 	{
-		collectorExtender.set(1.0);
+		collectorExtender.set(-1.0);
 		Timer.delay(timeVal);
 		collectorExtender.set(0);
 	}
