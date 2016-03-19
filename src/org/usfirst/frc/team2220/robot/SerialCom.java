@@ -38,22 +38,30 @@ public class SerialCom {
 	
 	public void update()
 	{
-		nbytes = serial.getBytesReceived();
-        if (nbytes > 1) //change this as you read more values
-        {
-            buffer = serial.read(nbytes);
-            currentLidarValue = ((buffer[0] & 0xFF) << 8 | (buffer[1] & 0xFF));
-            //autonomousValue = (buffer[0] & 0xFF);
-            
-            if(lidarValues.size() > 5)
-            {
-            	//if(currentLidarValue < lidarSum + 15000)
-            	if(currentLidarValue< 15000)
-            		lidarValues.add(currentLidarValue);	
-            }
-            else
-            	lidarValues.add(currentLidarValue);
-        }
+		try
+		{
+			nbytes = serial.getBytesReceived();
+	        if (nbytes > 1) //change this as you read more values
+	        {
+
+	        	buffer = serial.read(nbytes);
+	            currentLidarValue = ((buffer[0] & 0xFF) << 8 | (buffer[1] & 0xFF));
+	            //autonomousValue = (buffer[0] & 0xFF);
+	            
+	            if(lidarValues.size() > 5)
+	            {
+	            	//if(currentLidarValue < lidarSum + 15000)
+	            	if(currentLidarValue< 15000)
+	            		lidarValues.add(currentLidarValue);	
+	            }
+	            else
+	            	lidarValues.add(currentLidarValue);
+	        }
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
         if(lidarValues.size() > 10)
         	lidarValues.remove(0);
         lidarSum = 0;

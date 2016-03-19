@@ -24,6 +24,7 @@ public class Autonomous {
 	Timer timer;
 	ImageProcessor processor;
 	SerialCom serial;
+	public boolean foundTarget = true;
 	
 	/**
 	 * Constructs parts of the robot as well as a timer
@@ -69,15 +70,19 @@ public class Autonomous {
 		double voltVal = (12.2204) * Math.pow((.99989), (serial.getAverageLidarValue()));
 		if(voltVal < 8.9)
 			voltVal = 8.9;
+		if(voltVal > 10)
+			voltVal = 10;
+		
+		voltVal = 8.9;
 		
 		System.out.println("Voltage = " + voltVal + "LIDAR = " + serial.getAverageLidarValue());
 		//voltVal = 8.8;
 		collector.set(-1.0);
-		Timer.delay(0.15); //previously 0.05
+		Timer.delay(0.2); //previously 0.05, then 0.15
 		collector.set(0);
 		Timer.delay(1.0);
-		rightShooter.set(-voltVal);
-		leftShooter.set(voltVal);
+		rightShooter.set(voltVal);
+		leftShooter.set(-voltVal);
 		Timer.delay(1.2);
 		collector.set(1.0);
 		Timer.delay(2.0);
@@ -98,20 +103,21 @@ public class Autonomous {
 		while(true)
 		{
 			Timer.delay(0.1); //allows robot to settle
-			double temp = processor.getLeftRightDistance();
-			SmartDashboard.putNumber("leftRight", temp);
+			double currentLTRVal = processor.getLeftRightDistance();
+			SmartDashboard.putNumber("leftRight", currentLTRVal);
 			//right - left
 			//if right bound positive
 			//if left bound negative
 			//if you want to bias right, increase negative allowance
 			//if you want to bias left, increase positive allowance
-			if(temp == 0)
+			if(currentLTRVal == 0)
 			{
 				//look again
+				//foundTarget = false;
 			}
-			else if(temp > 15 || temp < -15)
+			else if(currentLTRVal > 5 || currentLTRVal < -25)
 			{
-				double temp2 = temp / 80;
+				double temp2 = currentLTRVal / 80;
 				if(temp2 > 0.5)
 					temp2 = 0.5;
 				else if(temp2 < -0.5)
@@ -124,8 +130,11 @@ public class Autonomous {
 			}
 			else
 				break;
-			if(tempTime.get() > 10)
+			if(tempTime.get() > 6)
+			{
+				//foundTarget = false;
 				break;
+			}
 		}
 	}
 	
@@ -194,6 +203,37 @@ public class Autonomous {
 		drivetrain.setRightWheels(0);
 	}
 	
+	public void timePointTurn(double turnTime, double motorPower, boolean rightSide)
+	{
+		timer.reset();
+		timer.start();
+		while(timer.get() < turnTime)
+		{
+			if(rightSide)
+			{
+				drivetrain.setRightWheels(motorPower);
+			}
+			else
+			{
+				drivetrain.setLeftWheels(motorPower);
+			}
+		}
+		drivetrain.setRightWheels(0);
+		drivetrain.setLeftWheels(0);
+	}
+	public void timeTurn(double turnTime, double motorPower)
+	{
+		timer.reset();
+		timer.start();
+		while(timer.get() < turnTime)
+		{
+			drivetrain.setRightWheels(motorPower);
+			drivetrain.setLeftWheels(-motorPower);
+		}
+		drivetrain.setRightWheels(0);
+		drivetrain.setLeftWheels(0);
+	}
+	
 	public void pointTurnGyro(double degrees, double motorPower)
 	{
 		double desiredVal = gyro.getAngle() + degrees;
@@ -229,6 +269,18 @@ public class Autonomous {
 		drivetrain.setRightWheels(0);
 	}
 	
+	public void drive(double seconds, double motorPower)
+	{
+		timer.reset();
+		timer.start();
+		while(timer.get() < seconds)
+		{
+			drivetrain.setLeftWheels(motorPower);
+			drivetrain.setRightWheels(motorPower);
+		}
+		drivetrain.setLeftWheels(0);
+		drivetrain.setRightWheels(0);
+	}
 	/**
 	 * Drives in a straight line, using the gyro to correct if it curves
 	 * @param seconds Time to drive

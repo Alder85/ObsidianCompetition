@@ -169,7 +169,7 @@ public class Robot extends SampleRobot {
      */
     public void autonomous() 
     {
-    	/*
+    	
     	if(isEnabled() && isAutonomous())
     	{
 	    	frWheel.enableBrakeMode(true);
@@ -178,15 +178,22 @@ public class Robot extends SampleRobot {
 	    	blWheel.enableBrakeMode(true);
 	    	//lowbar
 	    	//TODO change this
-	    	autonomous.extendCollector(0.6);
 	    	
-	    	autonomous.driveGyro(2.7, 0.6);
-	    	autonomous.pointTurnGyro(55, 0.6);
+	    	autonomous.extendCollector(0.46);
+	    	
+	    	autonomous.drive(2.7, 0.6); //prev driveGyro
+	    	autonomous.timePointTurn(0.75, 1.0, true);
+	    	//autonomous.pointTurnGyro(55, 0.6);
+	    	
 	    	autonomous.lineUpToShoot();
-	    	autonomous.readSerial();
-	    	autonomous.shoot();
+	    	if(autonomous.foundTarget)
+	    	{
+		    	autonomous.readSerial();
+		    	autonomous.shoot();
+	    	}
+	    	
 	    }
-	    */
+	    
 
     }
 	/**
@@ -456,6 +463,7 @@ public class Robot extends SampleRobot {
 			/////////////////////////
 			//   Test All Modules  //
 			/////////////////////////
+
         	frWheel.test();
         	flWheel.test();
         	blWheel.test();
