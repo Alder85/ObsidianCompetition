@@ -183,6 +183,10 @@ public class Robot extends SampleRobot {
 	    	
 	    	autonomous.drive(2.7, 0.6); //prev driveGyro
 	    	autonomous.timePointTurn(0.75, 1.0, true);
+	    	autonomous.shoot();
+	    	//autonomous.uncollect(5.0);
+	    	/*
+	    	autonomous.timePointTurn(0.75, 1.0, true);
 	    	//autonomous.pointTurnGyro(55, 0.6);
 	    	
 	    	autonomous.lineUpToShoot();
@@ -191,6 +195,7 @@ public class Robot extends SampleRobot {
 		    	autonomous.readSerial();
 		    	autonomous.shoot();
 	    	}
+	    	*/
 	    	
 	    }
 	    
@@ -399,17 +404,17 @@ public class Robot extends SampleRobot {
 				//change this
 				if(manipulatorController.getPOV() == 0) //forwards
 				{
-					if(frontCollector.get())
+					//if(frontCollector.get())
 	        			collectorExtender.set(-1.0);
-	        		else
-	        			collectorExtender.set(0);
+	        		//else
+	        		//	collectorExtender.set(0);
 				}
 				else if(manipulatorController.getPOV() == 180)
 				{
-					if(rearCollector.get())
+					//if(rearCollector.get())
 	        			collectorExtender.set(1.0);
-	        		else
-	        			collectorExtender.set(0);
+	        	//	else
+	        	//		collectorExtender.set(0);
 				}
 				else
 	        	{

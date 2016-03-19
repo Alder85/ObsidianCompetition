@@ -73,7 +73,7 @@ public class Autonomous {
 		if(voltVal > 10)
 			voltVal = 10;
 		
-		voltVal = 8.9;
+		voltVal = 7;
 		
 		System.out.println("Voltage = " + voltVal + "LIDAR = " + serial.getAverageLidarValue());
 		//voltVal = 8.8;
@@ -89,6 +89,13 @@ public class Autonomous {
 		rightShooter.set(0);
 		leftShooter.set(0);
 		collector.set(0);
+	}
+	
+	public void uncollect(double seconds)
+	{
+		collector.set(-1.0);
+		Timer.delay(seconds);
+		collector.set(0.0);
 	}
 	
 	
@@ -115,7 +122,7 @@ public class Autonomous {
 				//look again
 				//foundTarget = false;
 			}
-			else if(currentLTRVal > 5 || currentLTRVal < -25)
+			else if(currentLTRVal > -15 || currentLTRVal < -45) //previously (15, -15), then (5, -25)
 			{
 				double temp2 = currentLTRVal / 80;
 				if(temp2 > 0.5)
