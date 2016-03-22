@@ -94,11 +94,18 @@ public class Robot extends SampleRobot {
 	{
 		serial = new SerialCom();
 		
-		frame = NIVision.imaqCreateImage(ImageType.IMAGE_RGB, 0);
-		session0 = NIVision.IMAQdxOpenCamera("cam3", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
-		session1 = NIVision.IMAQdxOpenCamera("cam4", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
-		NIVision.IMAQdxConfigureGrab(session1);
-		processor = new ImageProcessor(session1);
+		try
+		{
+			frame = NIVision.imaqCreateImage(ImageType.IMAGE_RGB, 0);
+			session0 = NIVision.IMAQdxOpenCamera("cam3", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+			session1 = NIVision.IMAQdxOpenCamera("cam4", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+			NIVision.IMAQdxConfigureGrab(session1);
+			processor = new ImageProcessor(session1);
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
 		
 		
 		collectorExtender.enableBrakeMode(true);
@@ -367,33 +374,40 @@ public class Robot extends SampleRobot {
 			/////////////////////////
 			//    Camera Toggle    //
 			///////////////////////// TODO fix
-			
-			double currentPOVval = driverController.getPOV();
-			if(currentPOVval == 270 && prevPOVval != 270)
+			try
 			{
+			
+				double currentPOVval = driverController.getPOV();
+				if(currentPOVval == 270 && prevPOVval != 270)
+				{
+					if(isCam1)
+					{
+						NIVision.IMAQdxStopAcquisition(session1);
+						NIVision.IMAQdxConfigureGrab(session0);
+						isCam1 = false;
+					}
+					else if(!isCam1)
+					{
+						NIVision.IMAQdxStopAcquisition(session0);
+						NIVision.IMAQdxConfigureGrab(session1);
+						isCam1 = true;
+					}
+				}
+				prevPOVval = currentPOVval;
 				if(isCam1)
 				{
-					NIVision.IMAQdxStopAcquisition(session1);
-					NIVision.IMAQdxConfigureGrab(session0);
-					isCam1 = false;
+					NIVision.IMAQdxGrab(session1, frame, 1);
 				}
-				else if(!isCam1)
+				else
 				{
-					NIVision.IMAQdxStopAcquisition(session0);
-					NIVision.IMAQdxConfigureGrab(session1);
-					isCam1 = true;
+					NIVision.IMAQdxGrab(session0, frame, 1);
 				}
+				CameraServer.getInstance().setImage(frame);
 			}
-			prevPOVval = currentPOVval;
-			if(isCam1)
+			catch(Exception e)
 			{
-				NIVision.IMAQdxGrab(session1, frame, 1);
+				System.out.println(e);
 			}
-			else
-			{
-				NIVision.IMAQdxGrab(session0, frame, 1);
-			}
-			CameraServer.getInstance().setImage(frame);
 			
 			/////////////////////////
 			//  Collector Extender //
