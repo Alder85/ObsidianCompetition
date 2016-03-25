@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.CANTalon.*;
 import edu.wpi.first.wpilibj.interfaces.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj.vision.USBCamera;
+
 import java.io.*;
 import java.util.ArrayList;
 
@@ -74,9 +76,10 @@ public class Robot extends SampleRobot {
 	Timer shootTimer = new Timer();
 	
 	CameraServer server; //.setQuality if necessary
+	USBCamera processingCam;
 	Image frame;
-	boolean isCam1 = true;
-	int session0, session1;
+	boolean isBackCamera = true;
+	int frontCameraSession, rearCameraSession;
 	double prevPOVval= 0;
 	
 	double allTuning;
@@ -94,13 +97,17 @@ public class Robot extends SampleRobot {
 	{
 		serial = new SerialCom();
 		
+		
 		try
 		{
+			//processingCam = new USBCamera("cam4");
+			//processingCam.setBrightness(5);
+			//processingCam.setExposureManual(0);
 			frame = NIVision.imaqCreateImage(ImageType.IMAGE_RGB, 0);
-			session0 = NIVision.IMAQdxOpenCamera("cam3", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
-			session1 = NIVision.IMAQdxOpenCamera("cam4", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
-			NIVision.IMAQdxConfigureGrab(session1);
-			processor = new ImageProcessor(session1);
+			frontCameraSession = NIVision.IMAQdxOpenCamera("cam3", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+			rearCameraSession = NIVision.IMAQdxOpenCamera("cam4", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+			NIVision.IMAQdxConfigureGrab(rearCameraSession);
+			processor = new ImageProcessor(rearCameraSession);
 		}
 		catch(Exception e)
 		{
@@ -190,7 +197,21 @@ public class Robot extends SampleRobot {
 	    	
 	    	autonomous.drive(2.7, 0.6); //prev driveGyro
 	    	autonomous.timePointTurn(0.75, 1.0, true);
+	    	autonomous.lineUpToShoot();
+	    	autonomous.lineUpToShoot();
 	    	autonomous.shoot();
+	    	
+	    	/*test for lining up stuff
+	    	try
+	    	{
+		    	autonomous.lineUpToShoot();
+		    	System.out.println("done");
+	    	}
+	    	catch(Exception e)
+	    	{
+	    		System.out.println(e);
+	    	}
+	    	*/
 	    	//autonomous.uncollect(5.0);
 	    	/*
 	    	autonomous.timePointTurn(0.75, 1.0, true);
@@ -323,24 +344,38 @@ public class Robot extends SampleRobot {
 			
 			if(manipulatorController.onPress(Button.rBumper))
 			{
-				overideShooting = true;
-				overideHigh = false;
+				overideShooting = false;
+				overideHigh = true;
 			}
 			if(manipulatorController.onPress(Button.xButton))
 			{
-				overideShooting = false;
-				overideHigh = true;				
+				//overideShooting = false;
+				//overideHigh = false;
+				try
+				{
+					if(!isBackCamera)
+					{
+						NIVision.IMAQdxStopAcquisition(frontCameraSession);
+						NIVision.IMAQdxConfigureGrab(rearCameraSession);
+						isBackCamera = true;
+					}
+					autonomous.lineUpToShoot();
+				}
+				catch(Exception e)
+				{
+					System.out.println(e);
+				}
 			}
 			if(manipulatorController.onPress(Button.lBumper))
 			{
-				overideShooting = false;
-				overideHigh = false;
+				overideShooting = true;
+				overideHigh = false;		
 			}
 			
 			if(overideShooting)
-				shooterVoltage = 8.9;
+				shooterVoltage = 9.0;
 			if(overideHigh)
-				shooterVoltage = 11;
+				shooterVoltage = 11.3;
 			
 			if(manipulatorController.whileHeld(Button.aButton))
 			{
@@ -380,27 +415,27 @@ public class Robot extends SampleRobot {
 				double currentPOVval = driverController.getPOV();
 				if(currentPOVval == 270 && prevPOVval != 270)
 				{
-					if(isCam1)
+					if(isBackCamera)
 					{
-						NIVision.IMAQdxStopAcquisition(session1);
-						NIVision.IMAQdxConfigureGrab(session0);
-						isCam1 = false;
+						NIVision.IMAQdxStopAcquisition(rearCameraSession);
+						NIVision.IMAQdxConfigureGrab(frontCameraSession);
+						isBackCamera = false;
 					}
-					else if(!isCam1)
+					else if(!isBackCamera)
 					{
-						NIVision.IMAQdxStopAcquisition(session0);
-						NIVision.IMAQdxConfigureGrab(session1);
-						isCam1 = true;
+						NIVision.IMAQdxStopAcquisition(frontCameraSession);
+						NIVision.IMAQdxConfigureGrab(rearCameraSession);
+						isBackCamera = true;
 					}
 				}
 				prevPOVval = currentPOVval;
-				if(isCam1)
+				if(isBackCamera)
 				{
-					NIVision.IMAQdxGrab(session1, frame, 1);
+					NIVision.IMAQdxGrab(rearCameraSession, frame, 1);
 				}
 				else
 				{
-					NIVision.IMAQdxGrab(session0, frame, 1);
+					NIVision.IMAQdxGrab(frontCameraSession, frame, 1);
 				}
 				CameraServer.getInstance().setImage(frame);
 			}
@@ -423,7 +458,7 @@ public class Robot extends SampleRobot {
 	        		//else
 	        		//	collectorExtender.set(0);
 				}
-				else if(manipulatorController.getPOV() == 180)
+				else if(manipulatorController.getPOV() == 180 || manipulatorController.getPOV() == 135 || manipulatorController.getPOV() == 225)
 				{
 					//if(rearCollector.get())
 	        			collectorExtender.set(1.0);

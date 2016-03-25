@@ -35,16 +35,30 @@ public class ImageProcessor {
 	NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(0, 220); //0, 255
 	*/
 	
-	NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(72, 135); // brightgreen/white
+	/*
+	NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(26, 135); // brightgreen/white
 	NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(60, 196);
 	NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(52, 231);
-	
-	/* use this maybe
-	NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(113, 124); // brightgreen/white
-	NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(233, 255);
-	NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(240, 255);
 	*/
+	NIVision.Range targetR = new NIVision.Range(241, 252);
+	NIVision.Range targetG = new NIVision.Range(240, 255);
+	NIVision.Range targetB = new NIVision.Range(231, 255);
 	
+	NIVision.Range DB_HUE = new NIVision.Range(105, 137); // brightgreen/white
+	NIVision.Range DB_SAT = new NIVision.Range(128, 255);
+	NIVision.Range DB_VAL = new NIVision.Range(224, 255);
+	
+	// use this maybe
+	/*
+	NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(113, 124); // brightgreen/white
+	NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(0, 255);
+	NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(240, 255);
+	//*/
+	/*
+	NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(0, 255); // brightgreen/white
+	NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(0, 255);
+	NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(0, 255);
+	*/
 	double AREA_MINIMUM = 0.25; // Default Area minimum for particle as a
 								// percentage of total image area
 	double AREA_MAXIMUM = 10.00; // default max
@@ -93,8 +107,9 @@ public class ImageProcessor {
 	boolean lookForTarget() {
 		// get image and particle numbers
 		NIVision.IMAQdxGrab(session, frame, 1);
-		NIVision.imaqColorThreshold(binaryFrame, frame, 255, NIVision.ColorMode.HSV, TOTE_HUE_RANGE, TOTE_SAT_RANGE,
-				TOTE_VAL_RANGE);
+		//NIVision.imaqColorThreshold(binaryFrame, frame, 255, NIVision.ColorMode.HSV, TOTE_HUE_RANGE, TOTE_SAT_RANGE, TOTE_VAL_RANGE);
+		//NIVision.imaqColorThreshold(binaryFrame, frame, 255, NIVision.ColorMode.RGB, targetR, targetB, targetG);
+		NIVision.imaqColorThreshold(binaryFrame, frame, 255, NIVision.ColorMode.HSV, DB_HUE, DB_SAT, DB_VAL);
 		int numParticles = NIVision.imaqCountParticles(binaryFrame, 1);
 
 		// filter out small particles
@@ -125,7 +140,8 @@ public class ImageProcessor {
 						NIVision.MeasurementType.MT_BOUNDING_RECT_RIGHT);
 				// if(par.BoundingRectLeft > 100) //use this to limit frame
 				// search size
-				particles.add(par);
+				if(par.BoundingRectRight < 500 && par.BoundingRectLeft > 100 && par.BoundingRectBottom < 240)
+					particles.add(par);
 			}
 			particles.sort(null);
 
