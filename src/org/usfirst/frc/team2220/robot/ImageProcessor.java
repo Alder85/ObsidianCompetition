@@ -40,13 +40,21 @@ public class ImageProcessor {
 	NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(60, 196);
 	NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(52, 231);
 	*/
-	NIVision.Range targetR = new NIVision.Range(241, 252);
-	NIVision.Range targetG = new NIVision.Range(240, 255);
-	NIVision.Range targetB = new NIVision.Range(231, 255);
+	NIVision.Range targetR = new NIVision.Range(150, 252);
+	NIVision.Range targetG = new NIVision.Range(245, 255);
+	NIVision.Range targetB = new NIVision.Range(234, 255);
 	
-	NIVision.Range DB_HUE = new NIVision.Range(105, 137); // brightgreen/white
-	NIVision.Range DB_SAT = new NIVision.Range(128, 255);
+	NIVision.Range DB_HUE = new NIVision.Range(59, 137); // lower previously 104
+	NIVision.Range DB_SAT = new NIVision.Range(64, 255); //lower previously 128
 	NIVision.Range DB_VAL = new NIVision.Range(224, 255);
+	
+	NIVision.Range HOPE_HUE = new NIVision.Range(110, 134); // brightgreen/white
+	NIVision.Range HOPE_SAT = new NIVision.Range(157, 255);
+	NIVision.Range HOPE_VAL = new NIVision.Range(245, 255);
+	
+	NIVision.Range Guess5_HUE = new NIVision.Range(59, 146);
+	NIVision.Range Guess5_SAT = new NIVision.Range(0, 255);
+	NIVision.Range Guess5_VAL = new NIVision.Range(146, 238);
 	
 	// use this maybe
 	/*
@@ -110,6 +118,7 @@ public class ImageProcessor {
 		//NIVision.imaqColorThreshold(binaryFrame, frame, 255, NIVision.ColorMode.HSV, TOTE_HUE_RANGE, TOTE_SAT_RANGE, TOTE_VAL_RANGE);
 		//NIVision.imaqColorThreshold(binaryFrame, frame, 255, NIVision.ColorMode.RGB, targetR, targetB, targetG);
 		NIVision.imaqColorThreshold(binaryFrame, frame, 255, NIVision.ColorMode.HSV, DB_HUE, DB_SAT, DB_VAL);
+		//NIVision.imaqColorThreshold(binaryFrame, frame, 255, NIVision.ColorMode.HSV, HOPE_HUE, HOPE_SAT, HOPE_VAL);
 		int numParticles = NIVision.imaqCountParticles(binaryFrame, 1);
 
 		// filter out small particles
@@ -140,7 +149,7 @@ public class ImageProcessor {
 						NIVision.MeasurementType.MT_BOUNDING_RECT_RIGHT);
 				// if(par.BoundingRectLeft > 100) //use this to limit frame
 				// search size
-				if(par.BoundingRectRight < 500 && par.BoundingRectLeft > 100 && par.BoundingRectBottom < 240)
+				if(par.BoundingRectRight < (640.0 * (2.0 / 3.0)) && par.BoundingRectLeft > (640.0 / 3.0) && par.BoundingRectBottom < 240)
 					particles.add(par);
 			}
 			particles.sort(null);
@@ -171,7 +180,7 @@ public class ImageProcessor {
 				rect = new NIVision.Rect(topBound, leftBound, height, width);
 				// (int)particles.elementAt(0).BoundingRectLeft
 				if (i == maxIndex) {
-					NIVision.imaqDrawShapeOnImage(frame, frame, rect, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
+					NIVision.imaqDrawShapeOnImage(frame, frame, rect, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_RECT, 0.0f);
 					SmartDashboard.putNumber("frameHeight", height);
 					SmartDashboard.putNumber("frameWidth", width);
 					SmartDashboard.putNumber("frameLeftBound", leftBound);
@@ -184,10 +193,10 @@ public class ImageProcessor {
 					SmartDashboard.putNumber("leftDistance", leftDistance);
 					SmartDashboard.putNumber("rightDistance", rightDistance);
 				} else
-					NIVision.imaqDrawShapeOnImage(frame, frame, rect, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_RECT, 0.0f);
+					NIVision.imaqDrawShapeOnImage(frame, frame, rect, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
 			}
 			CameraServer.getInstance().setImage(frame);
-
+			//CameraServer.getInstance().setImage(binaryFrame);
 			scores.Aspect = AspectScore(particles.elementAt(maxIndex));
 			SmartDashboard.putNumber("Aspect", scores.Aspect);
 			scores.Area = AreaScore(particles.elementAt(maxIndex));
@@ -205,6 +214,7 @@ public class ImageProcessor {
 		} else {
 			// SmartDashboard.putBoolean("IsTote", false);
 			CameraServer.getInstance().setImage(frame);
+			//CameraServer.getInstance().setImage(binaryFrame);
 			return false;
 		}
 	}

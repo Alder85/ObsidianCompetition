@@ -17,6 +17,8 @@ public class SerialCom {
     boolean LEDon = false;
     boolean cmd_sent = false;
     
+    byte previousByte = 0;
+    
     private double currentLidarValue;
     private double autonomousValue;
     private double LEDValue;
@@ -40,6 +42,7 @@ public class SerialCom {
 	{
 		try
 		{
+			/*
 			nbytes = serial.getBytesReceived();
 	        if (nbytes > 1) //change this as you read more values
 	        {
@@ -57,11 +60,14 @@ public class SerialCom {
 	            else
 	            	lidarValues.add(currentLidarValue);
 	        }
+	        */
+	        
 		}
 		catch(Exception e)
 		{
 			System.out.println(e);
 		}
+		
         if(lidarValues.size() > 10)
         	lidarValues.remove(0);
         lidarSum = 0;
@@ -70,6 +76,23 @@ public class SerialCom {
         if(lidarValues.size() != 0)
         	lidarAverage = lidarSum / lidarValues.size();
 	}
+	
+	public void sendByte(byte newByte)
+	{
+		if(newByte != previousByte)
+		{
+			previousByte = newByte;
+			try
+			{
+				//send info
+				buffer[0] = newByte;
+		        nbytes = serial.write(buffer, 1);
+			}
+			catch(Exception e){}
+		}
+	}
+	
+	
 	
 	public double getLidarValue()
 	{

@@ -46,7 +46,7 @@ public class Robot extends SampleRobot {
 	TwilightTalon blWheel = new TwilightTalon(3);
 	TwilightTalon brWheel = new TwilightTalon(6);
 	
-	TwilightTalon collector = new TwilightTalon(9);
+	TwilightTalon collector = new TwilightTalon(15);
 	TwilightTalon rightShooter = new TwilightTalon(10);
 	TwilightTalon leftShooter  = new TwilightTalon(12);
 	
@@ -193,12 +193,16 @@ public class Robot extends SampleRobot {
 	    	//lowbar
 	    	//TODO change this
 	    	
-	    	autonomous.extendCollector(0.46);
+	    	autonomous.extendCollector(0.6);
 	    	
 	    	autonomous.drive(2.7, 0.6); //prev driveGyro
-	    	autonomous.timePointTurn(0.75, 1.0, true);
-	    	autonomous.lineUpToShoot();
-	    	autonomous.lineUpToShoot();
+	    	autonomous.pointTurnGyro(55, 0.6);
+	    	//autonomous.timePointTurn(0.73, 1.0, true);
+	    	try
+	    	{
+	    		autonomous.lineUpToShoot(5);
+	    	} 
+	    	catch(Exception e){}
 	    	autonomous.shoot();
 	    	
 	    	/*test for lining up stuff
@@ -255,7 +259,7 @@ public class Robot extends SampleRobot {
            
             SmartDashboard.putNumber("rawLidar", serial.getLidarValue());
             SmartDashboard.putNumber("lidar", serial.getAverageLidarValue());
-            System.out.println("" + serial.getAverageLidarValue() + " " + serial.getLidarValue() +  " " + shooterVoltage);
+            //System.out.println("" + serial.getAverageLidarValue() + " " + serial.getLidarValue() +  " " + shooterVoltage);
 			/////////////////////////
 			//  Primary Controller //
 			/////////////////////////
@@ -347,7 +351,7 @@ public class Robot extends SampleRobot {
 				overideShooting = false;
 				overideHigh = true;
 			}
-			if(manipulatorController.onPress(Button.xButton))
+			if(manipulatorController.whileHeld(Button.xButton))
 			{
 				//overideShooting = false;
 				//overideHigh = false;
@@ -359,7 +363,7 @@ public class Robot extends SampleRobot {
 						NIVision.IMAQdxConfigureGrab(rearCameraSession);
 						isBackCamera = true;
 					}
-					autonomous.lineUpToShoot();
+					autonomous.lineUpToShoot(1);
 				}
 				catch(Exception e)
 				{
@@ -379,6 +383,7 @@ public class Robot extends SampleRobot {
 			
 			if(manipulatorController.whileHeld(Button.aButton))
 			{
+				serial.sendByte((byte) 's');
 				autoShooting = true;
 				if(shootTimer.get() == 0)
 					shootTimer.start();
@@ -391,6 +396,7 @@ public class Robot extends SampleRobot {
         	}
         	else
         	{
+        		serial.sendByte((byte) 'n');
         		autoShooting = false;
         		rightShooter.set(0);
         		leftShooter.set(0);

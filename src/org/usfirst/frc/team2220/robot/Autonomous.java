@@ -73,12 +73,12 @@ public class Autonomous {
 		if(voltVal > 10)
 			voltVal = 10;
 		
-		voltVal = 9.2;
+		voltVal = 8.9;
 		
 		System.out.println("Voltage = " + voltVal + "LIDAR = " + serial.getAverageLidarValue());
 		//voltVal = 8.8;
 		collector.set(-1.0);
-		Timer.delay(0.2); //previously 0.05, then 0.15
+		Timer.delay(0.4); //previously 0.05, then 0.15, then 0.2
 		collector.set(0);
 		Timer.delay(1.0);
 		rightShooter.set(voltVal);
@@ -103,13 +103,13 @@ public class Autonomous {
 	/**
 	 * Uses RTL camera values to line up facing straight at the goal
 	 */
-	public void lineUpToShoot()
+	public void lineUpToShoot(double seconds)
 	{
 		Timer tempTime = new Timer();
 		tempTime.start();
 		while(true)
 		{
-			Timer.delay(0.1); //allows robot to settle
+			//Timer.delay(0.1); //allows robot to settle
 			double currentLTRVal = processor.getLeftRightDistance();
 			SmartDashboard.putNumber("leftRight", currentLTRVal);
 			//right - left
@@ -137,7 +137,7 @@ public class Autonomous {
 			}
 			else
 				break;
-			if(tempTime.get() > 2)
+			if(tempTime.get() > seconds)
 			{
 				//foundTarget = false;
 				break;
