@@ -76,14 +76,14 @@ public class Robot extends SampleRobot {
 	Timer shootTimer = new Timer();
 	
 	CameraServer server; //.setQuality if necessary
-	USBCamera processingCam;
+	//USBCamera processingCam;
 	Image frame;
 	boolean isBackCamera = true;
-	int frontCameraSession, rearCameraSession;
+	int frontCameraSession;
 	double prevPOVval= 0;
 	
 	double allTuning;
-	ImageProcessor processor;
+	ImageProcessorTemp processor;
 	Autonomous autonomous;
 	SerialCom serial;
 	
@@ -100,20 +100,25 @@ public class Robot extends SampleRobot {
 		
 		try
 		{
-			//processingCam = new USBCamera("cam4");
-			//processingCam.setBrightness(5);
-			//processingCam.setExposureManual(0);
-			frame = NIVision.imaqCreateImage(ImageType.IMAGE_RGB, 0);
 			frontCameraSession = NIVision.IMAQdxOpenCamera("cam3", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
-			rearCameraSession = NIVision.IMAQdxOpenCamera("cam4", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
-			NIVision.IMAQdxConfigureGrab(rearCameraSession);
-			processor = new ImageProcessor(rearCameraSession);
+			NIVision.IMAQdxConfigureGrab(frontCameraSession);
 		}
 		catch(Exception e)
 		{
 			System.out.println(e);
 		}
 		
+		try
+		{
+			processor = new ImageProcessorTemp();
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+		
+		frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+
 		
 		collectorExtender.enableBrakeMode(true);
     	
@@ -193,41 +198,33 @@ public class Robot extends SampleRobot {
 	    	//lowbar
 	    	//TODO change this
 	    	
-	    	autonomous.extendCollector(0.6);
+	    	autonomous.extendCollector(1.75);
 	    	
-	    	autonomous.drive(2.7, 0.6); //prev driveGyro
-	    	autonomous.pointTurnGyro(55, 0.6);
-	    	//autonomous.timePointTurn(0.73, 1.0, true);
-	    	try
-	    	{
-	    		autonomous.lineUpToShoot(5);
-	    	} 
-	    	catch(Exception e){}
+	    	autonomous.driveGyro(2.7, 0.6); //this goes under low bar from start position
+	    	Timer.delay(0.75);
+	    	autonomous.turnGyro(30, 1.0, 0.3);
+	    	
+	    	autonomous.driveGyro(0.3, 0.6);
+
+			for (int i = 0; i < 1; i++) {
+				autonomous.lineUpToShoot(true);
+			}
+			for (int i = 0; i < 2; i++) {
+				autonomous.lineUpToShoot(false);
+			}
+			for (int i = 0; i < 2; i++) {
+				autonomous.lineUpToShoot(true);
+			}
+    		
 	    	autonomous.shoot();
 	    	
-	    	/*test for lining up stuff
-	    	try
-	    	{
-		    	autonomous.lineUpToShoot();
-		    	System.out.println("done");
-	    	}
-	    	catch(Exception e)
-	    	{
-	    		System.out.println(e);
-	    	}
-	    	*/
-	    	//autonomous.uncollect(5.0);
-	    	/*
-	    	autonomous.timePointTurn(0.75, 1.0, true);
-	    	//autonomous.pointTurnGyro(55, 0.6);
+	    	autonomous.driveGyro(0.175, -0.6);
 	    	
-	    	autonomous.lineUpToShoot();
-	    	if(autonomous.foundTarget)
-	    	{
-		    	autonomous.readSerial();
-		    	autonomous.shoot();
-	    	}
-	    	*/
+	    	autonomous.turnGyro(-40, 0.65, 0.3);
+	    	//autonomous.driveGyro(2.7, -0.7);
+    		
+    		Timer.delay(0.005);	
+	    	
 	    	
 	    }
 	    
@@ -249,17 +246,9 @@ public class Robot extends SampleRobot {
     	double wheelDZ = 0.15;
     	double tempTune;
     	int dashCount = 0;
-    	double shooterVoltage = 10;
+    	double shooterVoltage = 15;
     	
         while (isOperatorControl() && isEnabled()) {
-			/////////////////////////
-			//         LIDAR       //
-			/////////////////////////
-        	serial.update();
-           
-            SmartDashboard.putNumber("rawLidar", serial.getLidarValue());
-            SmartDashboard.putNumber("lidar", serial.getAverageLidarValue());
-            //System.out.println("" + serial.getAverageLidarValue() + " " + serial.getLidarValue() +  " " + shooterVoltage);
 			/////////////////////////
 			//  Primary Controller //
 			/////////////////////////
@@ -268,10 +257,10 @@ public class Robot extends SampleRobot {
 			/////////////////////////
 			//       Modules       //
 			/////////////////////////
-        	if(driverController.onPress(TriggerButton.lTrigger))
+        	if(driverController.onPressPos(AxisButton.lTrigger))
         		drivetrain.incrementAllModules(-1);
         	
-        	if(driverController.onPress(TriggerButton.rTrigger))
+        	if(driverController.onPressPos(AxisButton.rTrigger))
         		drivetrain.incrementAllModules(1);
         	
         	if(driverController.onPress(Button.rBumper))
@@ -298,6 +287,15 @@ public class Robot extends SampleRobot {
         	}
         	SmartDashboard.putNumber("tempTune", tempTune);
         	
+        	if(driverController.whileHeld(Button.xButton))
+        	{
+        		autonomous.lineUpToShoot(true);
+        	}
+        	if(driverController.whileHeld(Button.bButton))
+        	{
+        		autonomous.lineUpToShoot(false);
+        	}
+        	
 			/////////////////////////
 			//     Drive Wheels    //
 			/////////////////////////
@@ -317,14 +315,14 @@ public class Robot extends SampleRobot {
 			///////////////////////// TODO add if becomes a problem
 			if(!autoShooting)
 			{
-				if(manipulatorController.whileHeld(TriggerButton.lTrigger)) //intake
+				if(manipulatorController.whileHeldPos(AxisButton.lTrigger)) //intake
 				{
 					//if(rearCollector.get())
 					SmartDashboard.putString("intakeTest", "intaking");
 						collector.set(1.0);
 						//else set 0
 				}
-				else if(manipulatorController.whileHeld(TriggerButton.rTrigger))
+				else if(manipulatorController.whileHeldPos(AxisButton.rTrigger))
 				{
 					SmartDashboard.putString("intakeTest", "outtaking");
 					//if(rearCollector.get())
@@ -341,49 +339,11 @@ public class Robot extends SampleRobot {
 			/////////////////////////
 			//    Shooter Wheels   //
 			/////////////////////////
-			shooterVoltage = (12.2204) * Math.pow((.99989), (serial.getAverageLidarValue()));
-			shooterVoltage += 0.5;
-			if(shooterVoltage < 8.9)
-				shooterVoltage = 8.9;
+			shooterVoltage = 15;
 			
-			if(manipulatorController.onPress(Button.rBumper))
-			{
-				overideShooting = false;
-				overideHigh = true;
-			}
-			if(manipulatorController.whileHeld(Button.xButton))
-			{
-				//overideShooting = false;
-				//overideHigh = false;
-				try
-				{
-					if(!isBackCamera)
-					{
-						NIVision.IMAQdxStopAcquisition(frontCameraSession);
-						NIVision.IMAQdxConfigureGrab(rearCameraSession);
-						isBackCamera = true;
-					}
-					autonomous.lineUpToShoot(1);
-				}
-				catch(Exception e)
-				{
-					System.out.println(e);
-				}
-			}
-			if(manipulatorController.onPress(Button.lBumper))
-			{
-				overideShooting = true;
-				overideHigh = false;		
-			}
-			
-			if(overideShooting)
-				shooterVoltage = 9.0;
-			if(overideHigh)
-				shooterVoltage = 11.3;
 			
 			if(manipulatorController.whileHeld(Button.aButton))
 			{
-				serial.sendByte((byte) 's');
 				autoShooting = true;
 				if(shootTimer.get() == 0)
 					shootTimer.start();
@@ -393,15 +353,24 @@ public class Robot extends SampleRobot {
 				{
 					collector.set(1.0);
 				}
-        	}
-        	else
-        	{
-        		serial.sendByte((byte) 'n');
-        		autoShooting = false;
-        		rightShooter.set(0);
-        		leftShooter.set(0);
-        		shootTimer.reset();
-        	}
+			}
+			else
+			{
+				autoShooting = false;
+				rightShooter.set(0);
+				leftShooter.set(0);
+				shootTimer.reset();
+			}
+			
+			
+			if(manipulatorController.onPress(Button.lBumper))
+			{
+				shotLength = 1.5;
+			}
+			if(manipulatorController.onPress(Button.rBumper))
+			{
+				shotLength = 2.1;
+			}
         	
 			
 			SmartDashboard.putNumber("shooterVoltage", shooterVoltage);
@@ -415,6 +384,13 @@ public class Robot extends SampleRobot {
 			/////////////////////////
 			//    Camera Toggle    //
 			///////////////////////// TODO fix
+			try
+			{
+				NIVision.IMAQdxGrab(frontCameraSession, frame, 1);
+				CameraServer.getInstance().setImage(frame);
+			}
+			catch(Exception e){}
+			/*
 			try
 			{
 			
@@ -449,6 +425,7 @@ public class Robot extends SampleRobot {
 			{
 				System.out.println(e);
 			}
+			*/
 			
 			/////////////////////////
 			//  Collector Extender //
@@ -523,12 +500,12 @@ public class Robot extends SampleRobot {
 			/////////////////////////
 			//   Test All Modules  //
 			/////////////////////////
-
-        	frWheel.test();
+        	
         	flWheel.test();
         	blWheel.test();
         	brWheel.test();
-
+        	frWheel.talon8test();
+        	
         	talon7.test();
         	talon2.test();
         	talon4.test();
@@ -544,6 +521,7 @@ public class Robot extends SampleRobot {
         	
         	if(manipulatorController.onPress(Button.back))
         	{
+        		System.out.println("all modules zerod");
         		talon7.enable();
         		talon2.enable();
         		talon4.enable();
@@ -554,6 +532,7 @@ public class Robot extends SampleRobot {
         		brModule.resetTarget();
         		
         		collector.enable();
+        		Timer.delay(0); //free CPU
         	}
         	if(manipulatorController.onPress(Button.start))
         	{

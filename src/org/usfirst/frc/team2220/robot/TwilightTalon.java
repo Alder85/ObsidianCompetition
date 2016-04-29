@@ -117,6 +117,43 @@ public class TwilightTalon extends CANTalon{
 	}
 	
 	/**
+	 * Tests whether Talon is within 'safe' levels<br>
+	 * if unsafe levels are surpassed for a time exceeding the tripTime variable, the motor is disabled
+	 * @return Whether the test was passed
+	 */
+	public boolean talon8test() {
+		boolean test = true;
+		if (isOverMaxCurrent()) 
+			test = false;
+		if(!test)
+		{
+			if(!tripped)
+			{
+				timer.reset();
+				timer.start();
+				tripped = true;
+			}
+			
+			if(timer.get() > tripTime) 
+			{
+				timer.stop();
+				timer.reset();
+				System.out.println("riperoni talon8-oni");
+				//this.disable();
+				//disabled = true;
+			}
+			
+		}
+		else
+		{
+			tripped = false;
+			timer.stop();
+			timer.reset();
+		}
+		return test;
+	}
+	
+	/**
 	 * @return current is surpassing maximum
 	 */
 	public boolean isOverMaxCurrent() {

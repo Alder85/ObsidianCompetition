@@ -88,15 +88,15 @@ public class XBoxController extends Joystick{
 	 * @author Josh
 	 *
 	 */
-	public enum TriggerButton
+	public enum AxisButton
 	{
-		rTrigger(0), lTrigger(1);
+		rTrigger(3), lTrigger(2), rightY(5);
 		
 		public int value;
 		public double[] currVal = {0, 0};
 		public double[] oldVal  = {0, 0};
 		
-		private TriggerButton(int value)
+		private AxisButton(int value)
 		{
 			this.value = value;
 		}
@@ -105,33 +105,45 @@ public class XBoxController extends Joystick{
 	/**
 	 * 
 	 * @param x trigger to check
-	 * @return true only once when TriggerButton is pressed
+	 * @return true only once when AxisButton is pressed
 	 */
-	public boolean onPress(TriggerButton x)
+	public boolean onPressPos(AxisButton x)
 	{
 		return (x.currVal[joystickNumber] > 0.85 && x.oldVal[joystickNumber] < 0.85);
 	}
+	
+	public boolean onPressNeg(AxisButton x)
+	{
+		return (x.currVal[joystickNumber] < -0.85 && x.oldVal[joystickNumber] > -0.85);
+	}
 
 	/**
 	 * 
 	 * @param x button to check
-	 * @return true constantly while TriggerButton is held
+	 * @return true constantly while AxisButton is held
 	 */
-	public boolean whileHeld(TriggerButton x) 
+	public boolean whileHeldPos(AxisButton x) 
 	{
 		return x.currVal[joystickNumber] > 0.85;
 	}
+	public boolean whileHeldNeg(AxisButton x) 
+	{
+		return x.currVal[joystickNumber] < -0.85;
+	}
 
 	/**
 	 * 
 	 * @param x button to check
-	 * @return true only once when TriggerButton is released
+	 * @return true only once when AxisButton is released
 	 */
-	public boolean onRelease(TriggerButton x)
+	public boolean onReleasePos(AxisButton x)
 	{
 		return (x.currVal[joystickNumber] < 0.85 && x.oldVal[joystickNumber] > 0.85);
 	}
-	
+	public boolean onReleaseNeg(AxisButton x)
+	{
+		return (x.currVal[joystickNumber] > -0.85 && x.oldVal[joystickNumber] < -0.85);
+	}
 	/**
 	 * POV enum to treat the POV like a button
 	 * @author Josh
@@ -194,11 +206,15 @@ public class XBoxController extends Joystick{
 			buttonArray[i].pressed[joystickNumber] = this.getRawButton(buttonArray[i].value);
 		}
 		
-		TriggerButton.rTrigger.oldVal[joystickNumber] = TriggerButton.rTrigger.currVal[joystickNumber];
-		TriggerButton.rTrigger.currVal[joystickNumber] = this.getRawAxis(3);
 		
-		TriggerButton.lTrigger.oldVal[joystickNumber] = TriggerButton.lTrigger.currVal[joystickNumber];
-		TriggerButton.lTrigger.currVal[joystickNumber] = this.getRawAxis(2);
+		AxisButton.rTrigger.oldVal[joystickNumber] = AxisButton.rTrigger.currVal[joystickNumber];
+		AxisButton.rTrigger.currVal[joystickNumber] = this.getRawAxis(3);
+		
+		AxisButton.lTrigger.oldVal[joystickNumber] = AxisButton.lTrigger.currVal[joystickNumber];
+		AxisButton.lTrigger.currVal[joystickNumber] = this.getRawAxis(2);
+		
+		AxisButton.rightY.oldVal[joystickNumber] = AxisButton.rightY.currVal[joystickNumber];
+		AxisButton.rightY.currVal[joystickNumber] = this.getRawAxis(AxisButton.rightY.value);
 		
 		POV.POV.oldVal = POV.POV.currVal;
 		POV.POV.currVal = this.getPOV();
