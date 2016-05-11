@@ -73,19 +73,26 @@ public class ImageProcessorTemp {
 			 78, 196
 			 RGB
 			 66, 255
-			 53, 255
+			 53, 255,
 			 100, 176
 			 */
 			//Constants
+			
 			/*
 			NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(50, 255);	//Default hue range for yellow tote
 			NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(50, 255);	//Default saturation range for yellow tote
 			NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(50, 255);	//Default value range for yellow tote
 			*/
-			NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(57, 255);	//Default hue range for yellow tote
-			NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(0, 140);	//Default saturation range for yellow tote
-			NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(88, 188);	//Default value range for yellow tote
 			
+			NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(0, 255);	//Default hue range for yellow tote
+			NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(0, 45);	//Default saturation range for yellow tote
+			NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(60, 164);	//Default value range for yellow tote
+			
+			/*
+			NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(50, 255);	//Default hue range for yellow tote
+			NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(0, 255);	//Default saturation range for yellow tote
+			NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(50, 255);	//Default value range for yellow tote
+			*/
 			double AREA_MINIMUM = 0.1; //Default Area minimum for particle as a percentage of total image area
 			double AREA_MAXIMUM = 100.0;
 			double LONG_RATIO = 2.22; //Tote long side = 26.9 / Tote height = 12.1 = 2.22
@@ -111,7 +118,7 @@ public class ImageProcessorTemp {
 	 *            session from the main class to use, so cameras can switch fine
 	 */
 	public ImageProcessorTemp() {
-		camera = new AxisCamera("169.254.141.214");
+		camera = new AxisCamera("axis-camera.local");
 		camera.writeColorLevel(100);
 		camera.writeBrightness(26);
 		camera.writeWhiteBalance(WhiteBalance.kFixedOutdoor1);

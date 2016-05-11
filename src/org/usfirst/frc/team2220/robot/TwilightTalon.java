@@ -12,7 +12,7 @@ public class TwilightTalon extends CANTalon{
 	private double maxCurrent;
 	private boolean disabled = false;
 	private boolean tripped = false;
-	private Timer timer = new Timer();
+	//private Timer timer = new Timer();
 	private Timer resetTimer = new Timer();
 	private double tripTime = 0.25; //change this is all motors are trippin
 	
@@ -93,15 +93,15 @@ public class TwilightTalon extends CANTalon{
 		{
 			if(!tripped)
 			{
-				timer.reset();
-				timer.start();
+				resetTimer.reset();
+				resetTimer.start();
 				tripped = true;
 			}
 			
-			if(timer.get() > tripTime) 
+			if(resetTimer.get() > tripTime) 
 			{
-				timer.stop();
-				timer.reset();
+				resetTimer.stop();
+				resetTimer.reset();
 				this.disable();
 				disabled = true;
 			}
@@ -110,8 +110,8 @@ public class TwilightTalon extends CANTalon{
 		else
 		{
 			tripped = false;
-			timer.stop();
-			timer.reset();
+			resetTimer.stop();
+			resetTimer.reset();
 		}
 		return test;
 	}
@@ -129,15 +129,15 @@ public class TwilightTalon extends CANTalon{
 		{
 			if(!tripped)
 			{
-				timer.reset();
-				timer.start();
+				resetTimer.reset();
+				resetTimer.start();
 				tripped = true;
 			}
 			
-			if(timer.get() > tripTime) 
+			if(resetTimer.get() > tripTime) 
 			{
-				timer.stop();
-				timer.reset();
+				resetTimer.stop();
+				resetTimer.reset();
 				System.out.println("riperoni talon8-oni");
 				//this.disable();
 				//disabled = true;
@@ -147,8 +147,8 @@ public class TwilightTalon extends CANTalon{
 		else
 		{
 			tripped = false;
-			timer.stop();
-			timer.reset();
+			resetTimer.stop();
+			resetTimer.reset();
 		}
 		return test;
 	}

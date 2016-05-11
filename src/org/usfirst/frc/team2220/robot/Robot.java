@@ -25,6 +25,7 @@ import java.util.ArrayList;
 public class Robot extends SampleRobot {
     SmartDashboard dashboard;
 
+    int cycleCount = 0;
     public Robot() {
         
     }    
@@ -181,7 +182,9 @@ public class Robot extends SampleRobot {
     }
 	
 	boolean autoShooting = false;
-	double shotLength = 1.375;
+	
+	double defaultSL = 1.5;
+	double shotLength = defaultSL;
 	/**
      * Using the autonomous object, runs a series of function on 
      * the declared drivetrain to complete autonomous goals
@@ -198,32 +201,33 @@ public class Robot extends SampleRobot {
 	    	//lowbar
 	    	//TODO change this
 	    	
-	    	autonomous.extendCollector(1.75);
+	    	autonomous.extendCollector(1.4);
 	    	
-	    	autonomous.driveGyro(2.7, 0.6); //this goes under low bar from start position
+	    	autonomous.driveGyro(2.0, 1.0); //this goes under low bar from start position
 	    	Timer.delay(0.75);
-	    	autonomous.turnGyro(30, 1.0, 0.3);
+	    	autonomous.turnGyro(35, 1.0, 0.3);
 	    	
 	    	autonomous.driveGyro(0.3, 0.6);
 
-			for (int i = 0; i < 1; i++) {
-				autonomous.lineUpToShoot(true);
+			for (int i = 0; i < 5; i++) {
+				if(autonomous.lineUpToShoot(false))
+				{
+					autonomous.shoot();
+			    	
+			    	autonomous.driveGyro(0.175, -0.6);
+			    	
+			    	autonomous.turnGyro(-40, 0.65, 0.3);
+			    	break;
+				}
 			}
-			for (int i = 0; i < 2; i++) {
-				autonomous.lineUpToShoot(false);
-			}
-			for (int i = 0; i < 2; i++) {
-				autonomous.lineUpToShoot(true);
-			}
-    		
-	    	autonomous.shoot();
+
+			drivetrain.setLeftWheels(0);
+			drivetrain.setRightWheels(0);
 	    	
-	    	autonomous.driveGyro(0.175, -0.6);
-	    	
-	    	autonomous.turnGyro(-40, 0.65, 0.3);
 	    	//autonomous.driveGyro(2.7, -0.7);
     		
     		Timer.delay(0.005);	
+    		
 	    	
 	    	
 	    }
@@ -244,7 +248,7 @@ public class Robot extends SampleRobot {
     	double leftAxis, rightAxis;
     	double wenchAxis;
     	double wheelDZ = 0.15;
-    	double tempTune;
+    	double tempTune = 0.4;
     	int dashCount = 0;
     	double shooterVoltage = 15;
     	
@@ -277,7 +281,7 @@ public class Robot extends SampleRobot {
         		blModule.setP(tempTune);
         		brModule.setP(tempTune);
         	}
-        	else
+        	if(driverController.onRelease(Button.bButton))
         	{
         		tempTune = allTuning;
         		frModule.setP(tempTune);
@@ -369,7 +373,7 @@ public class Robot extends SampleRobot {
 			}
 			if(manipulatorController.onPress(Button.rBumper))
 			{
-				shotLength = 2.1;
+				shotLength = 1.2;
 			}
         	
 			
@@ -492,7 +496,7 @@ public class Robot extends SampleRobot {
         	dashCount++;
         	if(dashCount > 20000)
         		dashCount = 0;
-        	if(dashCount % 1 == 0) //TODO change this
+        	if(dashCount % 100 == 0) //TODO change this
         	{
         		printManipulatorInfo();
         		//printModuleInfo();
@@ -501,15 +505,22 @@ public class Robot extends SampleRobot {
 			//   Test All Modules  //
 			/////////////////////////
         	
-        	flWheel.test();
-        	blWheel.test();
-        	brWheel.test();
-        	frWheel.talon8test();
+        	//flWheel.test();
+        	//blWheel.test();
+        	//brWheel.test();
+        	//frWheel.talon8test();
         	
-        	talon7.test();
-        	talon2.test();
-        	talon4.test();
-        	talon5.test();
+        	if(++cycleCount % 48 == 0)
+        	{
+	        	talon7.test();
+	        	talon2.test();
+	        	talon4.test();
+	        	talon5.test();
+	        	
+	        	collector.test();
+	
+	        	collectorExtender.test();
+        	}
 
         	if((talon7.isDisabled() || talon2.isDisabled() || talon4.isDisabled() || talon5.isDisabled()))
         	{
@@ -543,10 +554,7 @@ public class Robot extends SampleRobot {
         	}
         	
         	
-        	collector.test();
         	
-        	//lifterRelease.test();
-        	collectorExtender.test();
         	
        
 

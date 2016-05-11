@@ -68,7 +68,7 @@ public class Autonomous {
 		Timer.delay(0.75);
 		rightShooter.set(voltVal);
 		leftShooter.set(-voltVal);
-		Timer.delay(1.3);
+		Timer.delay(1.2);
 		collector.set(1.0);
 		Timer.delay(0.75);
 		rightShooter.set(0);
@@ -95,7 +95,7 @@ public class Autonomous {
 				leftRightValue = processor.getLeftRightDistance(favorLeft);
 				successI++;
 			} catch (Exception e) {
-				//System.out.println(e);
+				System.out.println(e);
 				failI++;
 				System.out.println("s -> " + successI + "  f -> " + failI);
 				return false;
@@ -105,14 +105,14 @@ public class Autonomous {
 			SmartDashboard.putNumber("leftRight", leftRightValue);
 			//int leftRightMid = -90; //prev -30 //prev 0//prev -20
 			
-			int leftRightMid = -90;
+			int leftRightMid = -90; //-120 was sketch
 			try 
 			{
 				leftRightMid = (int) SmartDashboard.getNumber("leftRightMid");
 			}
 			catch(Exception e)
 			{
-				SmartDashboard.putNumber("leftRightMid", -90);
+				SmartDashboard.putNumber("leftRightMid", leftRightMid);
 			}
 			
 			//prev -30 rev
@@ -130,7 +130,7 @@ public class Autonomous {
 			else if(leftRightValue > leftRightMid + leftRightRange || leftRightValue < leftRightMid - leftRightRange) //values in pixels
 			{
 				leftRightValue -= leftRightMid;
-				double wheelMoveVal = leftRightValue * 0.003; //prev 0.004//previously .0075
+				double wheelMoveVal = leftRightValue * 0.003;//prev 0.002//prev 0.003 //prev 0.004//previously .0075
 				
 				SmartDashboard.putNumber("prevTurnVal", wheelMoveVal);
 				double maxVal = 0.6;
