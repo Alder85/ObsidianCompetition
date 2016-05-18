@@ -183,7 +183,8 @@ public class Robot extends SampleRobot {
 	
 	boolean autoShooting = false;
 	
-	double defaultSL = 1.5;
+	double defaultSL = 1.8;
+	double maxSL = 2.1;
 	double shotLength = defaultSL;
 	/**
      * Using the autonomous object, runs a series of function on 
@@ -369,11 +370,11 @@ public class Robot extends SampleRobot {
 			
 			if(manipulatorController.onPress(Button.lBumper))
 			{
-				shotLength = 1.5;
+				shotLength = maxSL;
 			}
 			if(manipulatorController.onPress(Button.rBumper))
 			{
-				shotLength = 1.2;
+				shotLength = defaultSL;
 			}
         	
 			
@@ -381,8 +382,8 @@ public class Robot extends SampleRobot {
 			SmartDashboard.putNumber("shotLength", shotLength);
 			SmartDashboard.putBoolean("autoShooting", autoShooting);
 			
-			SmartDashboard.putNumber("rightShooterVoltage", rightShooter.getOutputVoltage());
-			SmartDashboard.putNumber("leftShooterVoltage", leftShooter.getOutputVoltage());
+		//	SmartDashboard.putNumber("rightShooterVoltage", rightShooter.getOutputVoltage());
+		//	SmartDashboard.putNumber("leftShooterVoltage", leftShooter.getOutputVoltage());
 			
 			SmartDashboard.putNumber("shootTimer", shootTimer.get());
 			/////////////////////////
@@ -498,7 +499,7 @@ public class Robot extends SampleRobot {
         		dashCount = 0;
         	if(dashCount % 100 == 0) //TODO change this
         	{
-        		printManipulatorInfo();
+        		//printManipulatorInfo();
         		//printModuleInfo();
         	}
 			/////////////////////////
@@ -510,8 +511,15 @@ public class Robot extends SampleRobot {
         	//brWheel.test();
         	//frWheel.talon8test();
         	
-        	if(++cycleCount % 48 == 0)
+        	if(++cycleCount % 42 == 0)
         	{
+        		/*
+        		flWheel.test();
+            	blWheel.test();
+            	brWheel.test();
+            	frWheel.talon8test();
+            	*/
+        		
 	        	talon7.test();
 	        	talon2.test();
 	        	talon4.test();
@@ -519,7 +527,7 @@ public class Robot extends SampleRobot {
 	        	
 	        	collector.test();
 	
-	        	collectorExtender.test();
+	        	//collectorExtender.test();
         	}
 
         	if((talon7.isDisabled() || talon2.isDisabled() || talon4.isDisabled() || talon5.isDisabled()))

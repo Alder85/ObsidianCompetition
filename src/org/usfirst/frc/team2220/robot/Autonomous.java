@@ -105,7 +105,7 @@ public class Autonomous {
 			SmartDashboard.putNumber("leftRight", leftRightValue);
 			//int leftRightMid = -90; //prev -30 //prev 0//prev -20
 			
-			int leftRightMid = -90; //-120 was sketch
+			int leftRightMid = 0; //-30//-90//-120 was sketch
 			try 
 			{
 				leftRightMid = (int) SmartDashboard.getNumber("leftRightMid");
@@ -130,7 +130,7 @@ public class Autonomous {
 			else if(leftRightValue > leftRightMid + leftRightRange || leftRightValue < leftRightMid - leftRightRange) //values in pixels
 			{
 				leftRightValue -= leftRightMid;
-				double wheelMoveVal = leftRightValue * 0.003;//prev 0.002//prev 0.003 //prev 0.004//previously .0075
+				double wheelMoveVal = leftRightValue * 0.004;//0.003//prev 0.002//prev 0.003 //prev 0.004//previously .0075
 				
 				SmartDashboard.putNumber("prevTurnVal", wheelMoveVal);
 				double maxVal = 0.6;

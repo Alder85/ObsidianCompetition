@@ -78,12 +78,12 @@ public class ImageProcessorTemp {
 			 */
 			//Constants
 			
-			/*
+			
 			NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(50, 255);	//Default hue range for yellow tote
 			NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(50, 255);	//Default saturation range for yellow tote
 			NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(50, 255);	//Default value range for yellow tote
-			*/
 			
+			/*
 			NIVision.Range TOTE_HUE_RANGE = new NIVision.Range(0, 255);	//Default hue range for yellow tote
 			NIVision.Range TOTE_SAT_RANGE = new NIVision.Range(0, 45);	//Default saturation range for yellow tote
 			NIVision.Range TOTE_VAL_RANGE = new NIVision.Range(60, 164);	//Default value range for yellow tote
