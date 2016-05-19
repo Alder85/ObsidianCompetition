@@ -202,22 +202,22 @@ public class Robot extends SampleRobot {
 	    	//lowbar
 	    	//TODO change this
 	    	
-	    	autonomous.extendCollector(1.4);
+	    //	autonomous.extendCollector(1.4);
 	    	
-	    	autonomous.driveGyro(2.0, 1.0); //this goes under low bar from start position
+	    	autonomous.driveGyro(1.75, 1.0); //this goes under low bar from start position
 	    	Timer.delay(0.75);
 	    	autonomous.turnGyro(35, 1.0, 0.3);
 	    	
 	    	autonomous.driveGyro(0.3, 0.6);
 
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < 15; i++) {
 				if(autonomous.lineUpToShoot(false))
 				{
 					autonomous.shoot();
 			    	
 			    	autonomous.driveGyro(0.175, -0.6);
 			    	
-			    	autonomous.turnGyro(-40, 0.65, 0.3);
+			    	//autonomous.turnGyro(-40, 0.65, 0.3);
 			    	break;
 				}
 			}

@@ -68,7 +68,7 @@ public class Autonomous {
 		Timer.delay(0.75);
 		rightShooter.set(voltVal);
 		leftShooter.set(-voltVal);
-		Timer.delay(1.2);
+		Timer.delay(1.8);
 		collector.set(1.0);
 		Timer.delay(0.75);
 		rightShooter.set(0);
